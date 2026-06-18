@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+hf_cache/
+frontend/
+.env
+.git/

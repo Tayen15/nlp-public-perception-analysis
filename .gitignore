@@ -1,0 +1,27 @@
+# Python Environments & Cache
+venv/
+__pycache__/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# AI Models & Data Cache
+# (SANGAT PENTING: Jangan hapus baris ini agar model 2GB tidak terupload ke GitHub)
+hf_cache/
+models/
+data/
+outputs/
+.gradio/
+
+# Frontend (Vite/Node)
+frontend/node_modules/
+frontend/dist/
+frontend/.npm/
+
+# Security & Secrets
+.env
+.env.*
+
+# Sub-repositories & Editor logs
+nlp-public-perception-analysis/
+.agq/
+.vscode/

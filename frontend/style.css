@@ -1,0 +1,149 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  min-height: 100vh;
+  padding: 2rem;
+  line-height: 1.6;
+}
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.glass-header {
+  background-color: #1e1e1e;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #333;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.glass-header h1 {
+  font-size: 2.2rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+.glass-header p {
+  color: #a0a0a0;
+  font-size: 1rem;
+}
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+@media (max-width: 768px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+}
+.glass-panel {
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 2rem;
+}
+.glass-panel h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.5rem;
+}
+.glass-panel h3 {
+  font-size: 1.1rem;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+.big-number {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #0078d4;
+  margin: 0.5rem 0 2rem 0;
+}
+.stat-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 50px;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+.bar-bg {
+  width: 100%;
+  height: 10px;
+  background-color: #333;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bar-fill { height: 100%; width: 0%; transition: width 1s ease-out; }
+.green { background-color: #4caf50; }
+.yellow { background-color: #ff9800; }
+.red { background-color: #f44336; }
+
+.recent-comments { list-style: none; font-size: 0.9rem; color: #cccccc;}
+.recent-comments li {
+  padding: 1rem;
+  background-color: #252525;
+  border-radius: 6px;
+  margin-bottom: 0.8rem;
+  border-left: 4px solid #0078d4;
+}
+.recent-comments strong { color: #ffffff; }
+
+textarea {
+  width: 100%;
+  height: 150px;
+  background-color: #252525;
+  border: 1px solid #444;
+  color: #e0e0e0;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  font-family: inherit;
+  resize: none;
+  font-size: 1rem;
+}
+textarea:focus { outline: none; border-color: #0078d4; }
+.glow-button {
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  background-color: #0078d4;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.glow-button:hover {
+  background-color: #005a9e;
+}
+.glow-button.loading-state {
+  background-color: #333333;
+  color: #888888;
+  cursor: wait;
+  pointer-events: none;
+}
+.result-box {
+  margin-top: 1.5rem;
+  background-color: #252525;
+  padding: 1.5rem;
+  border-radius: 6px;
+  border: 1px solid #333;
+}
+.result-box.hidden { display: none; }
+.result-box.show { display: block; }
+.result-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem;}
+.result-item:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+.res-label { font-size: 1rem; color: #a0a0a0;}
+.badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  background-color: #333;
+  color: #ffffff; /* Override inline color with solid if needed, but JS controls color */
+}
