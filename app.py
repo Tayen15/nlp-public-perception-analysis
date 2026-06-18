@@ -43,14 +43,14 @@ except Exception as e:
 
 print("Model siap digunakan.")
 
+from fastapi.responses import RedirectResponse
+
 # API ENDPOINT
 
 @app.get("/")
 def read_root():
-    return {
-        "status": "Online", 
-        "message": "NLP API Server berjalan dengan baik. Akses /gradio untuk melihat UI Web Klasik."
-    }
+    # Otomatis alihkan (redirect) halaman utama ke UI Gradio
+    return RedirectResponse(url="/gradio")
 
 class PredictRequest(BaseModel):
     text: str
