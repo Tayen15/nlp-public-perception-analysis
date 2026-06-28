@@ -11,6 +11,8 @@ models/
 data/
 outputs/
 .gradio/
+sarcasm_model/
+sarcasm_model_output/
 
 # Frontend (Vite/Node)
 frontend/node_modules/

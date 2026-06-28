@@ -41,6 +41,16 @@ except Exception as e:
     print(f"Gagal memuat model Zero-Shot: {e}")
     has_stance_model = False
 
+try:
+    if os.path.exists("./sarcasm_model"):
+        sarcasm_pipeline = pipeline("text-classification", model="./sarcasm_model")
+        has_sarcasm_model = True
+    else:
+        has_sarcasm_model = False
+except Exception as e:
+    print(f"Gagal memuat model Sarkasme: {e}")
+    has_sarcasm_model = False
+
 print("Model siap digunakan.")
 
 from fastapi.responses import RedirectResponse
@@ -90,12 +100,25 @@ def get_dashboard_stats():
 def predict_text(req: PredictRequest):
     text = req.text
     
+    # Sarcasm Check
+    is_sarcastic = False
+    if has_sarcasm_model:
+        try:
+            sarc_res = sarcasm_pipeline(text, truncation=True, max_length=512)[0]
+            if sarc_res['label'] == 'LABEL_1':
+                is_sarcastic = True
+        except:
+            pass
+
     # Sentiment Analysis
     try:
         sent_res = sentiment_pipeline(text, truncation=True, max_length=512)[0]
         raw_sent = sent_res['label'].lower()
         label_map = {'positive': 'Positif', 'negative': 'Negatif', 'neutral': 'Netral'}
         sentiment = label_map.get(raw_sent, 'Netral')
+        
+        if is_sarcastic:
+            sentiment = f"{sentiment} (Terdeteksi Sarkasme / Berpotensi Negatif)"
     except:
         sentiment = "Netral"
         
@@ -121,12 +144,24 @@ def analyze_perception_gradio(text):
     if not text.strip():
         return "Teks kosong", "Tidak diketahui"
 
+    is_sarcastic = False
+    if has_sarcasm_model:
+        try:
+            sarc_res = sarcasm_pipeline(text, truncation=True, max_length=512)
+            if sarc_res[0]['label'] == 'LABEL_1':
+                is_sarcastic = True
+        except:
+            pass
+
     if has_sentiment_model:
         try:
             sent_result = sentiment_pipeline(text, truncation=True, max_length=512)
             label_sent = sent_result[0]["label"].title()
             score_sent = sent_result[0]["score"] * 100
             sentiment = f"{label_sent} ({score_sent:.1f}%)"
+            
+            if is_sarcastic:
+                sentiment = f"{sentiment} ⚠️ (Terindikasi Sarkasme, makna mungkin berlawanan)"
         except:
             sentiment = "Error Sentimen"
     else:
