@@ -5,67 +5,155 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Analisis Sentimen Publik AI</title>
   <link rel="stylesheet" href="./style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-  <div class="app-container">
-    <header class="glass-header">
-      <h1>Dashboard NLP Persepsi Publik</h1>
-      <p>Menganalisis Opini Warga Net secara Real-time dengan IndoBERT & Zero-Shot AI</p>
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-box">
+          <i data-lucide="brain-circuit"></i>
+        </div>
+        <div>
+          <h1>NLP Persepsi Publik</h1>
+          <p>Dashboard Analisis Sentimen Warga Net</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="status-badge"><i data-lucide="activity" class="sm-icon"></i> IndoBERT Zero-Shot Live</span>
+      </div>
     </header>
 
-    <main class="dashboard-grid">
-      <!-- Panel Kiri: Statistik -->
-      <section class="glass-panel stats-panel">
-        <h2>Total Data Tersimpan</h2>
-        <div class="big-number" id="total-comments">Memuat...</div>
-        
-        <h3>Distribusi Sentimen Global</h3>
-        <div class="stat-bars">
-          <div class="stat-row">
-            <span>Positif</span>
-            <div class="bar-bg"><div class="bar-fill green" id="bar-pos"></div></div>
-            <span id="txt-pos">0</span>
+    <main class="main-content">
+      <!-- KPI Row -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon blue"><i data-lucide="message-square"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Total Data Dianalisis</span>
+            <span class="kpi-value" id="total-comments">Memuat...</span>
           </div>
-          <div class="stat-row">
-            <span>Netral</span>
-            <div class="bar-bg"><div class="bar-fill yellow" id="bar-net"></div></div>
-            <span id="txt-net">0</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon green"><i data-lucide="trending-up"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Sentimen Positif</span>
+            <span class="kpi-value" id="kpi-pos">0</span>
           </div>
-          <div class="stat-row">
-            <span>Negatif</span>
-            <div class="bar-bg"><div class="bar-fill red" id="bar-neg"></div></div>
-            <span id="txt-neg">0</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon red"><i data-lucide="trending-down"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Sentimen Negatif</span>
+            <span class="kpi-value" id="kpi-neg">0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Middle Row -->
+      <section class="middle-grid">
+        <!-- Live Predictor -->
+        <div class="panel predictor-panel">
+          <div class="panel-header">
+            <h2><i data-lucide="sparkles"></i> Live AI Predictor</h2>
+            <p>Ketikkan opini atau pilih contoh di bawah ini untuk melihat prediksi NLP secara instan.</p>
+          </div>
+          
+          <div class="examples-container">
+            <span class="example-label">Contoh:</span>
+            <button class="example-chip" onclick="fillExample('Kinerja pemerintah saat ini sangat baik dan membantu ekonomi.')">Positif</button>
+            <button class="example-chip" onclick="fillExample('Banyak kebijakan yang membingungkan dan merugikan rakyat kecil.')">Negatif</button>
+            <button class="example-chip" onclick="fillExample('Pemerintah baru saja mengesahkan undang-undang perpajakan hari ini.')">Netral</button>
+          </div>
+
+          <textarea id="user-input" placeholder="Ketikkan opini/komentar terkait pemerintah di sini..."></textarea>
+          
+          <button id="predict-btn" class="action-btn">
+            <i data-lucide="scan-text"></i> Analisis Teks
+          </button>
+          
+          <div id="result-box" class="result-box hidden">
+            <div class="result-row">
+              <span class="res-title">Sentimen Dominan</span>
+              <span id="res-sentiment" class="badge">...</span>
+            </div>
+            <div class="result-row">
+              <span class="res-title">Deteksi Stance</span>
+              <span id="res-stance" class="badge">...</span>
+            </div>
           </div>
         </div>
 
-        <h3 style="margin-top:30px; margin-bottom: 10px;">Komentar Terbaru</h3>
-        <ul class="recent-comments" id="recent-list">
-          <li>Memuat komentar YouTube...</li>
-        </ul>
+        <!-- Distribution -->
+        <div class="panel dist-panel">
+          <div class="panel-header">
+            <h2><i data-lucide="pie-chart"></i> Distribusi Sentimen</h2>
+          </div>
+          <div class="distribution-bars">
+            <div class="dist-row">
+              <div class="dist-label">
+                <span>Positif</span>
+                <span id="txt-pos" class="dist-count">0</span>
+              </div>
+              <div class="bar-bg"><div class="bar-fill green" id="bar-pos"></div></div>
+            </div>
+            <div class="dist-row">
+              <div class="dist-label">
+                <span>Netral</span>
+                <span id="txt-net" class="dist-count">0</span>
+              </div>
+              <div class="bar-bg"><div class="bar-fill yellow" id="bar-net"></div></div>
+            </div>
+            <div class="dist-row">
+              <div class="dist-label">
+                <span>Negatif</span>
+                <span id="txt-neg" class="dist-count">0</span>
+              </div>
+              <div class="bar-bg"><div class="bar-fill red" id="bar-neg"></div></div>
+            </div>
+          </div>
+          
+          <div class="info-box">
+            <i data-lucide="info"></i>
+            <p>Data diambil dari komentar YouTube secara live.</p>
+          </div>
+        </div>
       </section>
 
-      <!-- Panel Kanan: Live Predictor -->
-      <section class="glass-panel predict-panel">
-        <h2>Live AI Predictor</h2>
-        <p>Ketikkan opini/komentar terkait pemerintah atau tokoh publik untuk melihat prediksi NLP secara instan.</p>
-        
-        <textarea id="user-input" placeholder="Contoh: Kinerja kementerian saat ini sangat mengecewakan dan banyak regulasi yang merugikan rakyat kecil..."></textarea>
-        <button id="predict-btn" class="glow-button">Analisis Menggunakan AI</button>
-        
-        <div id="result-box" class="result-box hidden">
-          <div class="result-item">
-            <span class="res-label">Sentimen Utama:</span>
-            <span id="res-sentiment" class="badge">...</span>
-          </div>
-          <div class="result-item">
-            <span class="res-label">Deteksi Stance (Zero-Shot):</span>
-            <span id="res-stance" class="badge">...</span>
-          </div>
+      <!-- Bottom Row: Data Table -->
+      <section class="panel table-panel">
+        <div class="panel-header">
+          <h2><i data-lucide="list"></i> Komentar Terbaru</h2>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th width="20%">Pengguna</th>
+                <th width="60%">Komentar</th>
+                <th width="20%">AI Predict</th>
+              </tr>
+            </thead>
+            <tbody id="recent-list">
+              <tr>
+                <td colspan="3" class="text-center">Memuat data...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
     </main>
   </div>
+  
+  <script>
+    lucide.createIcons();
+    function fillExample(text) {
+      document.getElementById('user-input').value = text;
+    }
+  </script>
   <script type="module" src="./main.js"></script>
 </body>
 </html>
