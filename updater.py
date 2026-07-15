@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import pandas as pd
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
@@ -85,15 +86,24 @@ def process_comments(df):
         print("DataFrame kosong, tidak ada yang diproses.")
         return df
         
-    print("\nMemuat model NLP (IndoBERT Sentiment)...")
+    print("\nMemuat model NLP (IndoBERT Sentiment & Zero-Shot Sarcasm)...")
     # Menonaktifkan peringatan symlink dari HF Hub
     os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
     
     try:
         sentiment_pipeline = pipeline("sentiment-analysis", model="w11wo/indonesian-roberta-base-sentiment-classifier")
+        zero_shot_pipeline = pipeline("zero-shot-classification", model="joeddav/xlm-roberta-large-xnli")
     except Exception as e:
         print(f"Gagal memuat model. Error: {e}")
         return df
+        
+    # Heuristic Keywords (Kamus Sindiran Umum & Emoji Kontradiktif)
+    sarcasm_keywords = [
+        r"\bhebat\s+banget\b", r"\bpintar\s+sekali\b", r"\btumben\b", 
+        r"\blucu\s+sekali\b", r"\bbagus\s+deh\b", r"\bprestasi\s+luar\s+biasa\b",
+        r"\bmakin\s+hancur\b", r"👏", r"🙃"
+    ]
+    sarcasm_pattern = re.compile("|".join(sarcasm_keywords), re.IGNORECASE)
     
     print(f"Memproses klasifikasi sentimen untuk {len(df)} komentar...")
     sentimen_results = []
@@ -104,12 +114,37 @@ def process_comments(df):
             print(f"  -> Proses {i+1}/{total} selesai...")
             
         try:
-            # Truncate string secara manual (maksimal karakter agar tidak OOM/Melebihi max_length token)
+            # Truncate string secara manual
             safe_text = str(text)[:512]
             res = sentiment_pipeline(safe_text, truncation=True, max_length=512)[0] 
             raw_sent = res['label'].lower()
             label_map = {'positive': 'Positif', 'negative': 'Negatif', 'neutral': 'Netral'}
-            sentimen_results.append(label_map.get(raw_sent, 'Netral'))
+            final_sentiment = label_map.get(raw_sent, 'Netral')
+            
+            # --- FILTER SARKASME (Hanya dijalankan jika terdeteksi Positif) ---
+            if final_sentiment == 'Positif':
+                is_sarcastic = False
+                
+                # 1. Fast Check: Rule-based Heuristics
+                if sarcasm_pattern.search(safe_text):
+                    is_sarcastic = True
+                else:
+                    # 2. Deep Check: Zero-Shot Classification
+                    zs_res = zero_shot_pipeline(
+                        safe_text, 
+                        candidate_labels=["pujian tulus", "sindiran atau sarkasme"],
+                        truncation=True, 
+                        max_length=512
+                    )
+                    # Jika model sangat yakin (>60%) bahwa itu sindiran
+                    if zs_res['labels'][0] == "sindiran atau sarkasme" and zs_res['scores'][0] > 0.6:
+                        is_sarcastic = True
+                        
+                # Flip sentimen jika terbukti sarkas
+                if is_sarcastic:
+                    final_sentiment = "Negatif (Sarkasme)"
+            
+            sentimen_results.append(final_sentiment)
         except:
             sentimen_results.append('Netral')
             
